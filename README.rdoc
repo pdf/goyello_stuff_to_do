@@ -7,10 +7,10 @@ It also allows to record time on choosen issue and save that time directly to is
 
 * Sortable list of issues assigned to user
 * Easy to use drag and drop prioritizing interface
-* Viewing other porject members lists
+* Viewing other project members lists
 * Recording time spent on issue in real time 
 * Quick log option for saving time on single issue log
-* Mass log optioin for saving time on multiple issues
+* Mass log option for saving time on multiple issues
 
 == Getting the plugin
 
@@ -28,19 +28,19 @@ There are two panes that can be sorted:
 
 === What I'm doing now
 
-This pane lists issues a user is supposed to be working on.  These issues should be the *most* important issues assigned to the user.  There are four buttons enable in this pane: Start (for time recording), Log time, Cancel (to discard recorded time), and Move To Available
+This pane lists issues a user is supposed to be working on.  These issues should be the *most* important issues assigned to the user.  There are four buttons enable in this pane: Start (for time recording), Log time, Cancel (to discard recorded time), and Move To Available. This pane is sortable by drag and drop method.
 
 === What's available
 
-This pane lists all the open issues that are assigned to the user.  They are the pool of issues that a user can draw on as they work on issues.
+This pane lists all the open issues that are assigned to the user.  They are the pool of issues that a user can draw to What I'm doing now list.
 
 === End Of Work and Break buttons
 
-Those buttons are visible on the top of the left pane. Break pauses issue time recordin. End Of Work is for multiple time log saving.
+Those buttons are visible on the top of the left pane. Break pauses issue time recording. End Of Work is for multiple time log saving.
 
-=== Select other member selectbox
+=== Other member staff to do selectbox
 
-It can be spoted at the top of the right pane. It will be visible if user role have right permissions. It is possible to select any other member of project that are available for user. User will not be able to edit them. This is only viewing option.
+This selectbox can be spoted at the top of the right pane. It will be visible if user role have right permissions. It is possible to select any other member of project that are available for user. User will not be able to edit them. This is only viewing option.
 
 == License
 

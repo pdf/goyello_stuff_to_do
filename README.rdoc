@@ -1,0 +1,49 @@
+= Redmine Stuff To Do Plugin
+
+The Stuff To Do plugin allows a user to order and prioritize the issues they are doing into a specific order. 
+It also allows to record time on choosen issue and save that time directly to issue time log.
+
+== Features
+
+* Sortable list of issues assigned to user
+* Easy to use drag and drop prioritizing interface
+* Viewing other porject members lists
+* Recording time spent on issue in real time 
+* Quick log option for saving time on single issue log
+* Mass log optioin for saving time on multiple issues
+
+== Getting the plugin
+
+== Installation and Setup
+
+1. Follow the Redmine plugin installation steps at: http://www.redmine.org/wiki/redmine/Plugins  Make sure the plugin is installed to +vendor/plugins/stuff_to_do_plugin+
+2. Run the plugin migrations +rake db:migrate_plugins+
+3. Restart your Redmine web servers (e.g. mongrel, thin, mod_rails)
+4. Login as administrator, set permissions for Roles and enable module in projects 
+5. Click the Stuff To Do link in the top left menu
+
+== Usage
+
+There are two panes that can be sorted:
+
+=== What I'm doing now
+
+This pane lists issues a user is supposed to be working on.  These issues should be the *most* important issues assigned to the user.  There are four buttons enable in this pane: Start (for time recording), Log time, Cancel (to discard recorded time), and Move To Available
+
+=== What's available
+
+This pane lists all the open issues that are assigned to the user.  They are the pool of issues that a user can draw on as they work on issues.
+
+=== End Of Work and Break buttons
+
+Those buttons are visible on the top of the left pane. Break pauses issue time recordin. End Of Work is for multiple time log saving.
+
+=== Select other member selectbox
+
+It can be spoted at the top of the right pane. It will be visible if user role have right permissions. It is possible to select any other member of project that are available for user. User will not be able to edit them. This is only viewing option.
+
+== License
+
+This plugin is licensed under the GNU GPL v2.  See COPYRIGHT.txt and GPL.txt for details.
+
+

@@ -1,0 +1,12 @@
+<%#
+# To change this template, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="doing-now-total-progress">
+  <%= progress_bar_sum(issues, :done_ratio, { :width => '200px', :legend =>  l(:stuff_to_do_text_total_progress) }) %>
+</div>
+
+<div id="doing-now-estimates">
+  <p><%= l(:stuff_to_do_text_total_estimates) %> <%= total_estimates(issues) %></p>
+</div>

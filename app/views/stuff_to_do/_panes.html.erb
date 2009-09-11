@@ -1,0 +1,21 @@
+<div id="panes">
+  <div class="splitcontentleft">
+    <%= render :partial => 'left_panes' %>
+  </div>
+
+  <div class="splitcontentright">
+    <%= render :partial => 'right_panes' %>
+  </div>
+
+</div>
+<script type="text/javascript">
+  if($('logtimediv') != null)
+  {
+    if(user_id == <%= User.current.id %>)
+    {
+      new Draggable('logtimediv');
+      attachSortables();
+      updateStopwatches();
+    }
+  }
+</script>

@@ -1,0 +1,34 @@
+<div class="pane" id="available-pane">
+  <h3><%= l(:stuff_to_do_what_is_available) %></h3>
+  <ol id="available">
+    <% unless @available.empty? %>
+      <table>
+        <thead>
+        <thead>
+          <tr>
+            <th></th>
+            <%= sort_header_tag('id', :title => 'Sort by contact ID', :caption => '#') %>
+            <%= sort_header_tag('project') %>
+            <%= sort_header_tag('tracker') %>
+            <%= sort_header_tag('estimated') %>
+            <%= sort_header_tag('subject') %>
+          </tr>
+        </thead>
+        <% if(StuffToDoController.plugin_exists?('redmine_goyello_schedules')) %>
+          <% if(@scheduled_issues.length > 0) %>
+            <tr><td colspan="6" style="font-style:italic; font-weight:bold;">Recommended issues</td></tr>
+            <%= render :partial => 'available_issue', :collection => @scheduled_issues %>
+            <tr><td>&nbsp;</td></tr>
+          <% end %>
+          <tr><td colspan="6" style="font-style:italic; font-weight:bold;">Available issues</td></tr>
+        <% end %>
+        <%= render :partial => 'available_issue', :collection => @available %>
+      </table>
+    <% else %>
+      <li class="empty-list">
+        <%= l(:stuff_to_do_drag_issue_remove_list) %>
+      </li>
+    <% end %>
+  </ol>
+</div>
+<%= javascript_tag("var filter = #{params[:filter].nil? ? 'null' : "'" + params[:filter].to_s + "'" }") %>

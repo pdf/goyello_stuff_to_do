@@ -1,0 +1,20 @@
+<tr class="issue <%= available_issue_counter.odd? ? "odd" :
+      "even" %> priority-<%= available_issue.priority.position %>"
+    id="issue_<%= available_issue.id %>">
+  <td>
+    <% if(@user == User.current) %>
+      <a href="#"  class="editable" title="Move to Doing now" onclick="Request.moveToDoing(<%= available_issue.id %>)"
+         id="moveToDoing_<%= available_issue.id.to_s %>">
+           <%= image_tag 'green_arrow.png', :plugin => 'stuff_to_do_plugin',
+             :size => '20x20', :title => "Move to Doing now" %>
+      </a>
+    <% end %>
+  </td>
+  <td class="id"><%= link_to('#' + available_issue.id.to_s, :controller => 'issues', :action => 'show',
+    :id => available_issue) %></td>
+  <td class="project"><%= h available_issue.project %></td>
+  <td class="tracker"><%= h available_issue.tracker %></td>
+  <td class="estimated"><%= h available_issue.estimated_hours %></td>
+  <td class="subject"><%= link_to(h(available_issue.subject), :controller => 'issues', :action => 'show',
+    :id => available_issue) %></td>
+</tr>

@@ -1,0 +1,25 @@
+<%= hidden_field_tag 'current_running', '' %>
+<%= hidden_field_tag 'user_id', "#{@user.id}" %>
+<div class="pane" id=" w-pane">
+  <h3>
+    <%= l(:stuff_to_do_what_im_doing_now) %>
+    <span class="subtitle"><%= l(:stuff_to_do_text_order_im_doing_it) %></span>
+  </h3>
+
+  <ol id="doing-now">
+    <% unless issues_for(@doing_now).empty? %>
+      <%= render :partial => 'doing_issue', :collection => issues_for(@doing_now) %>
+    <% else %>
+      <li class="empty-list">
+        <%= l(:stuff_to_do_drag_issue_create_list) %>
+      </li>
+    <% end %>
+  </ol>
+
+  <%#*<div class="pane-summary" id="pane-summary">%>
+    <%#= render :partial => 'pane_summary', :locals => { :issues => issues_for(@doing_now) } %>
+  <%#*</div>%>
+
+</div>
+
+

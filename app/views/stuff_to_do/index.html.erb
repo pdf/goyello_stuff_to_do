@@ -1,0 +1,79 @@
+<% html_title(l(:stuff_to_do_title)) %>
+<h1><%= l(:stuff_to_do_title) %></h1>
+
+<div class="flash error" style="display:none"></div>
+
+<div class="menu">
+  <% if true == @user_allowed %>
+    <div class="user">
+      <label for="user_id">View another user's stuff to do</label>
+      <%= collection_select(:user, :id, @users.sort, :id, :name, { }, { :name => 'user_id',
+          :onchange => 'changeUser(this)' }) %>
+    </div>
+  <% end %>
+</div>
+
+<div class="control-buttons"
+<% if(@user != User.current) %>
+       style="display: none"
+     <% end %>
+     >
+  <a href="#" title="Mass log time" onclick="endOfWork()">
+    <%= image_tag 'End_of_work.png', :plugin => 'stuff_to_do_plugin',
+      :size => '40x40', :title => "Mass log time" %>
+  </a>
+  <a href="#"  id="loggingBreakButton" style="display: none"
+     title="Pause time recording" onclick="stopLoggingTime()">
+       <%= image_tag 'break.png', :plugin => 'stuff_to_do_plugin',
+         :size => '40x40', :title => "Pause time recording" %>
+  </a>
+</div>
+<div style="clear:right;"></div>
+<div id="ccontent">
+  <%= render :partial => 'panes' %>
+</div>
+<div style="clear:both;"></div>
+<div id="logtimediv" style="display: none;">
+</div>
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag "stuff_to_do.css", :plugin => "stuff_to_do_plugin", :media => 'all' %>
+  <%= stylesheet_link_tag "jquery.tooltip.css", :plugin => "stuff_to_do_plugin", :media => 'all' %>
+  <%= javascript_include_tag 'jquery-1.2.6.min.js', :plugin => 'stuff_to_do_plugin' %>
+  <%= javascript_include_tag 'ui/ui.core.js', :plugin => 'stuff_to_do_plugin' %>
+  <%= javascript_include_tag 'ui/ui.sortable.js', :plugin => 'stuff_to_do_plugin' %>
+  <%= javascript_tag("jQuery.noConflict();") %>
+  <% if(@user == User.current) %>
+    <%= javascript_include_tag 'stuff-to-do.js', :plugin => 'stuff_to_do_plugin' %>
+    <%= javascript_tag("var editable = true;") %>
+  <% else %>
+    <%= javascript_tag 'var editable = false;' %>
+  <% end %>
+  <%= javascript_include_tag 'gyModalbox.js', :plugin => 'stuff_to_do_plugin' %>
+  <%= javascript_include_tag 'stopwatch.js', :plugin => 'stuff_to_do_plugin' %>
+  <%= javascript_include_tag 'gyStuffToDo.js', :plugin => 'stuff_to_do_plugin' %>
+  <%= javascript_include_tag 'jquery.tooltip.js', :plugin => 'stuff_to_do_plugin' %>
+<% end %>
+<script type="text/javascript">
+  var user_id = getUrlVars();
+  var current_user_id = <%= User.current.id %>;
+  var sort = false;
+  user_id = user_id['user_id'];
+  if(user_id == undefined)
+  {
+    user_id = <%= User.current.id %>
+    sort = true;
+  }
+  new Ajax.Updater('content', '/stuff_to_do?user_id=' + user_id, {
+    method: 'get',
+    asynchronous: false,
+    onComplete:function()
+    {
+      if(sort)
+      {
+        attachSortables();
+        updateStopwatches();
+        updateElements();
+      }
+    }
+  });
+</script>

@@ -1,0 +1,12 @@
+<%#
+# To change this template, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="<%= "estimate_#{issue.id}" %>" class="estimate">
+  <%= h issue.estimated_hours %> &nbsp;
+</div>
+
+<div id="<%= "progress_#{issue.id}" %>" class="progress">
+  <%= progress_bar(issue.done_ratio, :width => '100%') %>
+</div>

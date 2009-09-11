@@ -1,0 +1,50 @@
+<% logtime_entry = LogtimeEntry.find_by_user_id_and_issue_id(@user.id, doing_issue.id) %>
+<li class="issue <%= doing_issue_counter.odd? ? "odd" : "even" %> priority-<%= doing_issue.priority.position %>"
+    id="issue_<%= doing_issue.id %>"
+    <% if(!logtime_entry.nil? && logtime_entry.state == 'Pending') %>
+      style="background-color: #d3d3d3"
+    <% end %>
+    >
+
+  <% if(@user == User.current) %>
+    <a href="#" id="<%= "start_#{doing_issue.id}" %>" title="Start timer"
+       onclick="<%= "startLogTime('#{doing_issue.id}')" %>">
+         <%= image_tag 'Play.png', :plugin => 'stuff_to_do_plugin',
+           :size => '20x20', :title => "Start timer" %>
+    </a>
+
+    <a href="#"  id="<%= "logTime_#{doing_issue.id}" %>" title="Log recorded time" style="display: none"
+       onclick=<%= "issueLogTime(#{doing_issue.id})" %> >
+         <%= image_tag 'Logtime.png', :plugin => 'stuff_to_do_plugin',
+           :size => '20x20', :title => "Log recorded time" %>
+    </a>
+
+    <a href="#"  id="<%= "reset_#{doing_issue.id}" %>" title="Reset timer" style="display: none"
+       onclick="<%= "Request.resetRecording(#{doing_issue.id})" %>">
+         <%= image_tag 'cancel.png', :plugin => 'stuff_to_do_plugin',
+           :size => '20x20', :title => "Reset timer" %>
+    </a>
+
+    <a href="#"  class="editable" title="Move to Available" onclick="Request.moveToAvailable(<%= doing_issue.id %>)"
+       id="moveToAvailable_<%= doing_issue.id.to_s %>">
+         <%= image_tag 'red_arrow.png', :plugin => 'stuff_to_do_plugin',
+           :size => '20x20', :title => 'Move to available' %>
+    </a>
+  <% end %>
+
+  <span class="stopwatch_span" id="stopwatch[<%= doing_issue.id %>]"
+  <% if(logtime_entry.nil? || logtime_entry.to_s == '00:00:00') %>
+          style="display: none"> 00:00:00
+    <% else %>
+      > <%= logtime_entry.to_s %>
+    <% end %>
+  </span>
+  <br/>
+
+  <span class="id"><%= link_to('#' + doing_issue.id.to_s, :controller => 'issues', :action => 'show', :id => doing_issue) %></span>
+  - <span class="project"><%= h(doing_issue.project.name) %></span>
+  - <span class="subject"><%= link_to(h(doing_issue.subject), :controller => 'issues', :action => 'show', :id => doing_issue) %></span>
+  <br/>&nbsp;
+  <input class="is_pending" type="hidden" id="pending_<%= doing_issue.id %>"
+         <%= !logtime_entry.nil? && logtime_entry.state == 'Pending' ? "value=\"1\"" : "value=\"0\"" %>/>
+</li>

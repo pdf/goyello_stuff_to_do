@@ -12,8 +12,6 @@ It also allows to record time on choosen issue and save that time directly to is
 * Quick log option for saving time on single issue log
 * Mass log option for saving time on multiple issues
 
-== Getting the plugin
-
 == Installation and Setup
 
 1. Follow the Redmine plugin installation steps at: http://www.redmine.org/wiki/redmine/Plugins  Make sure the plugin is installed to +vendor/plugins/stuff_to_do_plugin+
@@ -21,6 +19,10 @@ It also allows to record time on choosen issue and save that time directly to is
 3. Restart your Redmine web servers (e.g. mongrel, thin, mod_rails)
 4. Login as administrator, set permissions for Roles and enable module in projects 
 5. Click the Stuff To Do link in the top left menu
+
+== Instructions
+
+Here is easy-to-read instruction: http://blog.goyello.com/2009/09/11/we-all-have-to-register-time-but-why-bother/
 
 == Usage
 

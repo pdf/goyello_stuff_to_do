@@ -2,14 +2,13 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 %>
-<%#= debug col.first %>
 <div class="box" style="margin: 3px">
-  <form method="post" action="">
-      <%= render :partial => 'update_logtime', :collection => col %>
-    <%= button_to_function 'Save', 'Request.saveRecordedTime(this.form, true);',
-      :id => 'save_logtime_button' %>
-    <%= button_to_function 'Save and stop', 'saveTimeAndStop(this.form)',
-      :id => 'saveAndCloseButton' %>
-    <%= button_to_function 'Cancel', 'cancelSaving()' %>
-  </form>
+<%#= render :partial => 'update_logtime', :collection => col %>
+  <%= render :partial => 'quicklog_form' %>
+
+  <%= button_to_function 'Save', "Request.saveRecordedTime($('quicklog_form_#{@issue.id}'), true);",
+    :id => 'save_logtime_button' %>
+  <%= button_to_function 'Save and stop', "saveTimeAndStop($('quicklog_form_#{@issue.id}'))",
+    :id => 'saveAndCloseButton' %>
+  <%= button_to_function 'Cancel', 'cancelSaving()' %>
 </div>

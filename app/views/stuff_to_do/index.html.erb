@@ -6,7 +6,7 @@
 <div class="menu">
   <% if true == @user_allowed %>
     <div class="user">
-      <label for="user_id">View another user's stuff to do</label>
+      <%= l(:stuff_to_do_label_view_user_list) %>
       <%= collection_select(:user, :id, @users.sort, :id, :name, { }, { :name => 'user_id',
           :onchange => 'changeUser(this)' }) %>
     </div>

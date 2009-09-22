@@ -139,40 +139,96 @@ var Request = {
   saveRecordedTime: function(form, action){
     if(true == validate_fields())
     {
-      var issueID = $('issue_id_0').value;
+      var issueID = $('issue_id').value;
   
-      if(null != action)
-      {
-        startLogTime(pausedIssueID);
-     
-        if(pausedIssueID != issueID)
-        {
-          //stopLoggingTime(issueID, true)
-          toggleButtonsOnBreak(issueID, true);
-        }
-        runningIssueID = pausedIssueID;
-        pausedIssueID = null;
-      }
-      else
-      {
-        //stopLoggingTime(issueID, true);
-        pausedIssueID = null;
-        $('stopwatch[' + issueID + ']').hide();
-        $('reset_' + issueID).hide();
-        $('logTime_' + issueID).hide();
-        $('loggingBreakButton').hide();
-        $('start_' + issueID).show();
-      }
-      $('stopwatch[' + issueID + ']').innerHTML = '00:00:00';
-      stopWatches[issueID].reset();
-      gyModalbox.hide();
-          
-      new Ajax.Request('/stuff_to_do/save_logtime', {
+      new Ajax.Request('/stuff_to_do/save_single_logtime_entry', {
         asynchronous:true,
         evalScripts:true,
-        parameters:Form.serialize(form)
+        parameters:Form.serialize(form),
+        onComplete: function(response)
+        {
+          var text = response.responseText;
+          if(text == 'Success')
+          {
+            if(null != action)
+            {
+              startLogTime(pausedIssueID);
+
+              if(pausedIssueID != issueID)
+              {
+                toggleButtonsOnBreak(issueID, true);
+              }
+              runningIssueID = pausedIssueID;
+              pausedIssueID = null;
+            }
+            else
+            {
+              pausedIssueID = null;
+              $('stopwatch[' + issueID + ']').hide();
+              $('reset_' + issueID).hide();
+              $('logTime_' + issueID).hide();
+              $('loggingBreakButton').hide();
+              $('start_' + issueID).show();
+            }
+            $('stopwatch[' + issueID + ']').innerHTML = '00:00:00';
+            stopWatches[issueID].reset();
+            gyModalbox.hide();
+          }
+          else
+          {
+            $('logtimediv').update(response.responseText)
+            gyModalbox.updateHeight();
+          }
+        }
       });
     }
+  }
+}
+
+function save_end_of_work_entries()
+{
+  var entries = $$('.end_of_work_entries');
+  entries.each(function(entry){
+    var issueID = entry.id.split('__')[1];
+
+    if(entry.style.display != 'none')
+    {
+      var form = $('quicklog_form_' + issueID);
+      new Ajax.Request('/stuff_to_do/save_single_logtime_entry', {
+        asynchronous:true,
+        evalScripts:true,
+        parameters:Form.serialize(form),
+        onComplete: function(response)
+        {
+          var text = response.responseText;
+          if(text == 'Success')
+          {
+            var entries = $$('.end_of_work_entries');
+
+            if(entries.length == 1)
+            {
+              window.location = '/stuff_to_do';
+            }
+            else if(entries.length > 1)
+            {
+              Element.remove($('end_of_work_entry__' + issueID));
+            }
+          }
+          else
+          {
+            $('end_of_work_entry__' + issueID).update(response.responseText)
+          }
+        }
+      });
+    }
+  })
+}
+
+function hide_element(element_id)
+{
+  if($(element_id) != null)
+  {
+    $(element_id).hide();
   }
 }
 
@@ -180,7 +236,7 @@ function submitEndOfWork()
 {
   if (validate_fields())
   {
-   $('endOfWorkForm').submit();
+    $('endOfWorkForm').submit();
   }
 }
 
@@ -212,8 +268,37 @@ function validate_fields()
 {
   var spent_time_fields = $$('.text_field');
   var activity_fields = $$('.select_field');
+  var date_fields = $$('.date_field');
   var idRegexp = /id="([^"]+)"/;
   var validation_passed = true;
+
+  date_fields.each(function(field){
+    var id = $(field).innerHTML.match(idRegexp);
+    if(null == id)
+    {
+      id = $(field).innerHTML.match(/id=([^\s]+)/gi);
+      id = id.toString().replace(/^id=(.+)$/, "$1")
+    }
+    else
+    {
+      id = id[1]
+    }
+
+    field = $(id);
+    var number = field.id.replace(/^.+_([0-9]+)_.+$/, "$1");
+    
+    if(!field.value.match(/^[0-9]*(\.?|,?)[0-9]?[0-9]$/gi))
+    {
+      $('spent_time_' + number + '_validation_failed').show();
+      validation_passed = false;
+    }
+    else
+    {
+      $('spent_time_' + number + '_validation_failed').hide();
+    }
+
+  })
+
   spent_time_fields.each(function(field){
     var id = $(field).innerHTML.match(idRegexp);
 
@@ -225,12 +310,12 @@ function validate_fields()
     else
     {
       id = id[1]
-      debugger;
+    //debugger;
     }
 
     field = $(id);
     var number = field.id.replace(/^.+_([0-9]+)_.+$/, "$1")
-
+    //alert(number)
     if(!field.value.match(/^[0-9]*(\.?|,?)[0-9]?[0-9]$/gi))
     {
       $('spent_time_' + number + '_validation_failed').show();
@@ -267,6 +352,7 @@ function validate_fields()
       $('activity_' + id + '_validation_failed').hide();
     }
   })
+
   if(gyModalbox.element != null)
   {
     gyModalbox.updateHeight();
@@ -537,21 +623,20 @@ function issueLogTime(issueID)
 {
   var logtimeDiv = $('logtimediv');
   
-  new Ajax.Updater('logtimediv', 'stuff_to_do/save_logtime', {
+  new Ajax.Updater('logtimediv', 'stuff_to_do/retrieve_issue_for_quicklog', {
     method: 'get',
     asynchronous: true,
     evalScripts: true,
     onComplete:function(){
       var opt = {
         opacity: 0.02,
-        width: 500
-      //        height: 263
+        width: 520
       };
       var issueBlock = $('issue_' + issueID)
       if(null != issueBlock)
       {
         opt.left = issueBlock.cumulativeOffset()['left'];
-        opt.top = issueBlock.cumulativeOffset()['top'] + issueBlock.getHeight();
+        opt.top = issueBlock.cumulativeOffset()['top'] + issueBlock.getHeight() - $('doing-now').scrollTop;
       }
       
       pausedIssueID = runningIssueID;

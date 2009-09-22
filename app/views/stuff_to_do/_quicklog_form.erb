@@ -1,0 +1,59 @@
+<div class="box">
+  <%= error_messages_for :time_entry %>
+  <span class="id"><%= link_to('#'+@issue.id.to_s, :controller => 'issues', :action => 'show', :id => @issue.id) %></span>
+  - <span class="project"><%= h(@issue.project.name) %></span>
+  - <span class="subject"><%= link_to(h(@issue.subject), :controller => 'issues', :action => 'show', :id => @issue.id) %></span>
+
+  <% form_tag({ :controller => 'stuff_to_do', :action => 'save_single_logtime_entry'}, :id => "quicklog_form_#{@issue.id}") do %>
+    <%= hidden_field(:issue, :id) %>
+    <%= hidden_field(:logtime_entry, :id) %>
+
+    <% fields_for :time_entry, @time_entry do |time_entry| %>
+    <%# Date field %>
+      <p><%= l(:field_spent_on) %><span class="required">*</span> <%= time_entry.text_field :spent_on, :size => 10,
+        :required => true %></p>
+    <% end %>
+
+  <%# Status field %>
+    <% fields_for :issue, @issue do |issue_field| %>
+      <% if(!@allowed_statuses.empty?) %>
+        <p><%= l(:label_issue_status_new) %>
+          <%= issue_field.select :status_id,
+            (@allowed_statuses.collect {|p| [p.name, p.id]}), :required => true %>
+        </p>
+      <% end %>
+
+    <%# Assigned to field %>
+      <p><%= l(:field_assigned_to) %> <%= issue_field.select :assigned_to_id,
+        (@issue.assignable_users.collect {|m| [m.name, m.id]}), :include_blank => true %></p>
+
+    <%# Done ratio field %>
+      <p><%= l(:field_done_ratio) %> <%= issue_field.select :done_ratio,
+        ((0..10).to_a.collect {|r| ["#{r*10} %", r*10] }) %></p>
+    <% end %>
+
+  <%# Spent time field %>
+    <% fields_for :time_entry, @time_entry do |time_entry| %>
+      <p><%= l(:field_hours) %><span class="required">*</span> <%= time_entry.text_field :hours, :size => 6,
+          :required => true,
+          :label => :label_spent_time %></p>
+      <% end %>
+
+    <% fields_for :time_entry, @time_entry do |time_entry| %>
+    <%# Activity field %>
+      <p><%= l(:field_activity) %><span class="required">*</span> <%= time_entry.select :activity_id,
+        activity_collection_for_select_options, :required => true %></p>
+
+    <%# Comments field %>
+      <p><%= l(:field_comments) %> <%= time_entry.text_field :comments, :size => 45, :style => "width: 350px" %></p>
+    <% end %>
+
+  <%# Custom fields %>
+    <% fields_for :issue, @issue do |issue_field| %>
+      <% @time_entry.custom_field_values.each do |value| %>
+        <p><%= custom_field_tag_with_label :time_entry, value %></p>
+      <% end %>
+
+    <% end %>
+  <% end %>
+</div>

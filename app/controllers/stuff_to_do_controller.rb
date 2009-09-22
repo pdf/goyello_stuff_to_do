@@ -10,8 +10,9 @@ class StuffToDoController < ApplicationController
 
   include StuffToDoHelper
   include SortHelper
+  helper :custom_fields
   helper :stuff_to_do
- 
+  helper :timelog
   helper :sort
 
   def self.visible_projects
@@ -119,20 +120,11 @@ class StuffToDoController < ApplicationController
     end
 
     logtime_entries = LogtimeEntry.all_recorded;
-    @@remote = false;
-
-    @entries = Array.new;
-    if(!logtime_entries.nil?)
-      logtime_entries.each do |entry|
-        hsh = Hash.new
-        hsh[:issue] = Issue.find_by_id(entry.issue_id);
-        hsh[:logtime_entry] = entry;
-        @entries << hsh
-      end
-    end
-
-    if(@entries.length == 0)
-      render :partial => 'no_time_recorded', :layout => true
+    issue_ids = logtime_entries.collect(&:issue_id);
+    @response_text = '';
+    issue_ids.each do |issue_id|
+      @issue_id = issue_id;
+      @response_text += retrieve_issue_for_quicklog
     end
   end
 
@@ -215,119 +207,81 @@ class StuffToDoController < ApplicationController
     render :nothing => true;
   end
 
-  #
-  # Action to handle logtime saving
-  #
-  def save_logtime
-    # We're receiving data to save
-    if(request.post?)
-      logtime_params_array = params[:logtime_entry];
+  def save_single_logtime_entry
+    result = '';
+    ActiveRecord::Base.transaction do
+      begin
+        @issue = Issue.find(params[:issue][:id].to_i)
+        @time_entry ||= TimeEntry.new(:project => @issue.project, :issue => @issue,
+          :user => User.current)
+        @time_entry.attributes = params[:time_entry]
+#        @time_entry.activity = Enumeration.find(params[:time_entry][:activity_id].to_i)
+        @time_entry.save;
+        @issue.assigned_to = User.find(params[:issue][:assigned_to_id].to_i);
+        @issue.done_ratio = params[:issue][:done_ratio].to_i;
+        
+        if(@time_entry.errors.empty?)
+          @issue.save;
+          LogtimeEntry.delete(params[:logtime_entry][:id].to_i);
 
-      # If there are more then one issue to save it's time (request from end of work page)
-      if(request.env['HTTP_REFERER'].match(/end_of_work/))
-        logtime_params_array.each do |logtime_params|
-          issue = Issue.find_by_id(params[:issue_id][logtime_params[0]].to_i);
-          if(!issue.nil?)
-            ActiveRecord::Base.transaction do
-              issue.update_attributes(
-                :done_ratio => logtime_params[1]['done_ratio'].to_i,
-                :assigned_to_id => logtime_params[1]['assigned_to'].to_i
-              );
-            
-              if(logtime_params[1].include?('status'))
-                issue.update_attribute(:status_id, logtime_params[1]['status'].to_i);
-              end
-            
-              time_entry = TimeEntry.new(
-                :project => Project.find_by_id(issue.project_id),
-                :issue => issue,
-                :user => User.current,
-                :hours => removeDecimalComma(logtime_params[1]['spent_time']).to_f,
-                :comments => logtime_params[1]['comments'],
-                :activity_id => logtime_params[1]['activity'].to_i,
-                :spent_on => logtime_params[1]['date']
-              );
+          result = 'Success';
+        else
+          @logtime_entry = LogtimeEntry.find_by_issue_id_and_user_id(params[:issue][:id], User.current.id);
+          @allowed_statuses = @issue.new_statuses_allowed_to(User.current)
+          @activities = Enumeration.find_all_by_opt('ACTI');
 
-              # Delete logtime entry after saving it's data
-              LogtimeEntry.delete(params[:recorded_time_id][logtime_params[0]].to_i)
-
-              time_entry.save;
-              issue.save;
-            end
+          if(request.env['HTTP_REFERER'].match(/end_of_work/))
+            render :partial => 'quicklog_form' and return
+          else
+            render :partial => 'save_single_entry' and return
           end
         end
-
-        redirect_to :action => 'index'
-        # request from quick log time form
-      else
-        issue = Issue.find(params[:issue_id]['0']);
-        logtime_params = logtime_params_array['0']
-        if(!issue.nil?)
-          ActiveRecord::Base.transaction do
-            issue.update_attributes(
-              :done_ratio => logtime_params['done_ratio'],
-              :assigned_to_id => logtime_params['assigned_to'].to_i
-            );
-
-            if(logtime_params.include?('status'))
-              issue.update_attribute(:status_id, logtime_params['status'].to_i);
-            end
-
-            time_entry = TimeEntry.new(
-              :project => Project.find(issue.project_id),
-              :issue => issue,
-              :user => User.current,
-              :hours => removeDecimalComma(logtime_params['spent_time']).to_f,
-              :comments => logtime_params['comments'],
-              :activity_id => logtime_params['activity'].to_i,
-              :spent_on => logtime_params['date']
-            );
-
-            #            if(request.env['HTTP_REFERER'].match(/end_of_work/))
-            #              LogtimeEntry.delete(params[:recorded_time_id][0].to_i)
-            #            else
-            logtime_entry = LogtimeEntry.find(params[:recorded_time_id]['0'].to_i);
-
-            if(logtime_entry.state != 'Break')
-              logtime_entry.update_attributes(
-                :start_date => Time.now,
-                :spent_time => 0.0
-              );
-              logtime_entry.save;
-            else
-              logtime_entry.destroy;
-            end
-            #            end
-           
-            time_entry.save;
-            issue.save;
-          end
-          render :nothing => true;
-        end
-      
+      rescue ActiveRecord::StatementInvalid
+        result = "Failed"
       end
-      # When request is not POST render time saving form for one issue
+    end
+
+    render :text => result
+  end
+
+  #
+  #
+  #
+  def retrieve_issue_for_quicklog
+    if(!params[:issue_id].nil?)
+      issue_id = params[:issue_id];
+    elsif(!@issue_id.nil?)
+      issue_id = @issue_id;
+    end
+    
+    @issue = Issue.find(issue_id);
+    @logtime_entry = LogtimeEntry.find_by_issue_id_and_user_id(issue_id, User.current.id);
+    @allowed_statuses = @issue.new_statuses_allowed_to(User.current)
+    @time_entry = TimeEntry.new(:hours => @logtime_entry.recorded_time,
+      :spent_on => Date.parse(@logtime_entry.start_date.to_s))
+    @activities = Enumeration.find_all_by_opt('ACTI');
+
+    if(@issue_id.nil?)
+      render :partial => 'save_single_entry'
     else
-      logtime_entry = LogtimeEntry.find_by_issue_id_and_user_id(params[:issue_id], User.current.id);
-      issue = Issue.find_by_id(params[:issue_id])
-
-      b = Array.new
-      a = Hash.new
-      a[:issue] = issue;
-      a[:logtime_entry] = logtime_entry;
-      b << a
-
-      render :partial => 'save_single_entry', :locals => { :col => b };
+      @issue_id = nil;
+      return render_to_string :partial => 'save_end_of_work_entry', :locals => {
+        :issue_id => issue_id
+      }
     end
   end
 
+  #
+  # When float number in textfield has decimal comma
+  # instead of decimal dot, replace it with dot
+  #
   def removeDecimalComma(number)
     return number.gsub(/,/, ".")
   end
 
   #
   #
-  # # # #
+  #
   def issuePlay
     user_id = User.current.id;
     issue_id = params[:issue_id];

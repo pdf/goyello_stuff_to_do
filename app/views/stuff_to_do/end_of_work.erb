@@ -2,18 +2,9 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 %>
-<% if @user == User.current %>
-  <%= javascript_tag 'var editable = true;' %>
-<% else %>
-  <%= javascript_tag 'var editable = false;' %>
-<% end %>
+<%= @response_text %>
 
-<form id="endOfWorkForm" method="post" action="/stuff_to_do/save_logtime">
-  <%= render :partial => 'update_logtime', :collection => @entries %>
-  <br/>
-  <input type="button" title="Save all" onclick="submitEndOfWork()" id="save_logtime_button"
-         value="SAVE ALL"/>
-</form>
+<%= button_to_function 'SAVE ALL', 'save_end_of_work_entries()' %>
 
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag "stuff_to_do.css", :plugin => "stuff_to_do_plugin", :media => 'all' %>

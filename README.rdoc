@@ -48,4 +48,7 @@ This selectbox can be spoted at the top of the right pane. It will be visible if
 
 This plugin is licensed under the GNU GPL v2.  See COPYRIGHT.txt and GPL.txt for details.
 
+== Authored by:
+* Base code: Eric Davis
+* Developed by: GOYELLO.com
 

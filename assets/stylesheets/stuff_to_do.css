@@ -10,6 +10,11 @@
   width:140px;*/
 }
 
+#logtimediv td label {
+  margin-left: -3px;
+  margin-right: 8px;
+}
+
 td.project {
   max-width: 150px;
   white-space: normal;
@@ -23,6 +28,12 @@ a img {
 .stopwatch_span {
   float: right;
   margin-right: 5px;
+}
+
+.comment_lab {
+  float: left;
+  line-height:55px;
+}
 }
 
 .img_available {

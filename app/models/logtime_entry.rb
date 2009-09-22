@@ -2,6 +2,10 @@ class LogtimeEntry < ActiveRecord::Base
   belongs_to :issue
   belongs_to :user
 
+  def date
+    return self.start_date
+  end
+
   #
   #
   #

@@ -1,0 +1,19 @@
+pl:
+  stuff_to_do_title: Plan na dziś
+  stuff_to_do_what_im_doing_now: "Czym się zajmuję"
+  stuff_to_do_what_is_recommended: "Polecone do zrobienia"
+  stuff_to_do_what_is_available: "Przypisane zagadnienia"
+  stuff_to_do_text_order_im_doing_it: "Uporządkowane w kolejności w jakiej wykonuję"
+  stuff_to_do_text_by_project_manager: Przypisane do mnie
+  stuff_to_do_label_view_user_list: "Wyślwietl plan na dziś innego użytkownika:"
+  stuff_to_do_text_total_progress: "Total Progress"
+  stuff_to_do_text_total_estimates: "Total Estimates"
+  stuff_to_do_label_project_manager_emails: Project Manager Emails
+  stuff_to_do_label_threshold: Threshold
+  stuff_to_do_label_email_to: Email addresses
+  stuff_to_do_text_settings: "A email is sent to the Project Manager when a user's Recommended item count reaches the threshold below.  Multiple email recipients can be specified by separating the email addresses with commas."
+  stuff_to_do_label_filter: Filtr
+  stuff_to_do_label_filter_by: Filtruj po...
+  stuff_to_do_drag_issue_create_list: Przeciągnij zagadnienia tutaj aby utworzyć nową listę.
+  stuff_to_do_drag_issue_remove_list: Przeciągnij zagadnienia tutaj aby usunąć je z listy.
+  

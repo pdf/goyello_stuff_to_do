@@ -16,11 +16,11 @@
         </thead>
         <% if(StuffToDoController.plugin_exists?('redmine_goyello_schedules')) %>
           <% if(@scheduled_issues.length > 0) %>
-            <tr><td colspan="6" style="font-style:italic; font-weight:bold;">Recommended issues</td></tr>
+            <tr><td colspan="6" style="font-style:italic; font-weight:bold;"><%= l(:stuff_to_do_what_is_recommended) %></td></tr>
             <%= render :partial => 'available_issue', :collection => @scheduled_issues %>
             <tr><td>&nbsp;</td></tr>
           <% end %>
-          <tr><td colspan="6" style="font-style:italic; font-weight:bold;">Available issues</td></tr>
+          <tr><td colspan="6" style="font-style:italic; font-weight:bold;"><%= l(:stuff_to_do_text_by_project_manager) %></td></tr>
         <% end %>
         <%= render :partial => 'available_issue', :collection => @available %>
       </table>
